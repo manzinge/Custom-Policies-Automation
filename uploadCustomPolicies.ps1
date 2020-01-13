@@ -4,7 +4,6 @@ param(
 )
 
 function CheckForModule {
-
     if(!(get-module AzureADPreview -ListAvailable)) {
         try {
             Write-Host "Installing AzureADPreview Module" -ForegroundColor Yellow
@@ -57,9 +56,14 @@ function UploadPolicies {
     }
 }
 function main {
-    CheckForModule
-    CheckForAzureConnection
-    UploadPolicies
+    try{
+        CheckForModule
+        CheckForAzureConnection
+        UploadPolicies
+    }catch{
+        Write-host "Encountered unexpected Error : $($error.exception.message)" -ForegroundColor Red
+        exit 1
+    }
 }
 
 main
