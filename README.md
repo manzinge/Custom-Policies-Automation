@@ -1,4 +1,9 @@
-# Custom-Policies-Automation
-PowerShell-Automation for Custom Policies (B2C)
+# PowerShell-Automation (Azure)
+PowerShell-Automation for Azure
 
-This is a small Repo with various Scripts to make it easier to upload files / Work with Azure B2C Solutions.
+Current-Scripts:
+  - Upload Custom Policies (B2C
+  - Upload Custom Templates (Blob Storage)
+  - Delete all Resource Groups of an Azure Tenant (Multiple-Subscriptions possible)
+
+This Repository pretty much contains all the random PowerShell-Scripts I write during my free time
