@@ -4,6 +4,8 @@ param(
     [String]$container
 )
 
+Add-Type -AssemblyName "System.Web"
+
 function CheckForModule {
     if(!(get-module Azure.Storage -ListAvailable)) {
         try {
@@ -32,22 +34,6 @@ function CreateNewContext {
     return $context
 }
 
-function UploadPolicies {
-    Write-Progress -Activity "Uploading Custom Policies" -Status "Getting Files" -PercentComplete 0 
-    $files = gci $directory | ? {$_.Name -like "*B2C*"}
-    $counter = 0
-    foreach($file in $files) {
-        try{
-            $counter++
-            $id = $file.Name.Substring($file.Name.IndexOf("B2C")).Split('.')[0]
-            Write-Progress -Activity "Uploading Custom Policies" -Status "Uploading $id" -PercentComplete (($counter/$files.count) * 100)
-            Set-AzureADMSTrustFrameworkPolicy -Id $id -InputFilePath $file.FullName | Out-Null
-            Write-host "Successfully updated $id" -ForegroundColor Green
-        }catch{
-            Write-host "Could not set Policy : $($file.name) because of : $($error.exception.message)" -ForegroundColor Red
-        }
-    }
-}
 function UploadFiles($context) {
     $files = gci $directory 
     if([String]::IsNullOrEmpty($container)) {
@@ -66,7 +52,8 @@ function UploadFiles($context) {
     foreach($file in $files) {
         $counter++
         try{
-            Set-AzureStorageBlobContent -Container $container -Context $context -File $file.FullName | Out-null
+            $mimeType = [System.Web.MimeMapping]::GetMimeMapping($file.FullName)
+            Set-AzureStorageBlobContent -Container $container -Context $context -File $file.FullName -Properties @{"ContentType" = $mimeType} -Force  | Out-null
             Write-Progress -Activity "Uploading Template Files" -Status "Uploading $($file.Name)" -PercentComplete (($counter/$files.count) * 100)
             Write-host "successfully uploaded file : $($file.Name) to Container $container" -ForegroundColor Green
         }catch{
