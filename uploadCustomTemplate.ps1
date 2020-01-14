@@ -6,7 +6,7 @@ param(
 
 Add-Type -AssemblyName "System.Web"
 
-function CheckForModule {
+function Request-Module  {
     if(!(get-module Azure.Storage -ListAvailable)) {
         try {
             Write-Host "Installing Azure.Storage Module" -ForegroundColor Yellow
@@ -24,7 +24,7 @@ if([String]::IsNullOrEmpty($directory)) {
     $directory = $PSScriptRoot
 }
 
-function CreateNewContext {
+function New-Context {
     $context = $null
     if([String]::IsNullOrEmpty($ConnectionString)) {
         $context = New-azurestoragecontext -connectionstring (Read-Host -Prompt "Please enter your Storage Connection String")
@@ -34,7 +34,7 @@ function CreateNewContext {
     return $context
 }
 
-function UploadFiles($context) {
+function Send-Files($context) {
     $files = gci $directory 
     if([String]::IsNullOrEmpty($container)) {
         $container = (Read-Host -Prompt "Please enter the desired Container (You can also create one)")
@@ -65,9 +65,9 @@ function UploadFiles($context) {
 
 function main {
     try{
-        CheckForModule
-        $ctx = CreateNewContext
-        UploadFiles -Context $ctx
+        Request-Module 
+        $ctx = New-Context
+        Send-Files -Context $ctx
     }catch{
         Write-host "Encountered unexpected Error : $($error.exception.message)" -ForegroundColor Red
         exit 1

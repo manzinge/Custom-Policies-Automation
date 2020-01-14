@@ -3,14 +3,14 @@ param(
     [String]$tenant
 )
 
-function CheckForModule {
+function Request-Module {
     if(!(get-module AzureADPreview -ListAvailable)) {
         try {
             Write-Host "Installing AzureADPreview Module" -ForegroundColor Yellow
             Install-Module AzureADPreview -force -AllowClobber
             Import-module AzureADPreview
         }catch{
-            Write-host "Could not install AzureAD Module because of : $($error.exception.message)" -ForegroundColor red
+            Write-host "Could not install AzureAD Module because of : $($error.exception.message)" -ForegroundColor Red
             exit
         }
     }
@@ -21,7 +21,7 @@ if([String]::IsNullOrEmpty($directory)) {
     $directory = $PSScriptRoot
 }
 
-function CheckForAzureConnection {
+function Test-AzureConnection {
     try{
         get-azureadtenantDetail -ErrorAction stop | out-null
     }catch{
@@ -33,7 +33,7 @@ function CheckForAzureConnection {
                 Connect-AzureAD -ErrorAction Stop
             }
         }catch{
-            Write-host "Could not connect to azureAd because : $($error.exception.message)" -ForegroundColor red
+            Write-host "Could not connect to azureAd because : $($error.exception.message)" -ForegroundColor Red
             exit 1
         }
     }
@@ -57,8 +57,8 @@ function UploadPolicies {
 }
 function main {
     try{
-        CheckForModule
-        CheckForAzureConnection
+        Request-Module
+        Test-AzureConnection
         UploadPolicies
     }catch{
         Write-host "Encountered unexpected Error : $($error.exception.message)" -ForegroundColor Red
